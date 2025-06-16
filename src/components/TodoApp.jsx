@@ -102,13 +102,19 @@ export default function TodoApp() {
         {tasks.map((task) => (
           <li
             key={Number(task.id)}
-            className={`flex justify-between items-center py-2 border-b ${
-              task.completed ? "text-green-600 line-through" : ""
-            }`}
+            className={`flex justify-between items-center py-2 border-b ${task.completed ? "text-green-600 line-through" : ""}`}
           >
-            <span onClick={() => handleToggle(Number(task.id))} className="cursor-pointer">
-              {task.content}
-            </span>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={task.completed}
+                onChange={() => handleToggle(Number(task.id))}
+                className="mr-2"
+              />
+              <span className="cursor-pointer">
+                {task.content}
+              </span>
+            </div>
             <button
               onClick={() => handleDelete(Number(task.id))}
               className="text-red-500 hover:text-red-700"
