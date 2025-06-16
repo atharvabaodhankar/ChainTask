@@ -1,12 +1,64 @@
-# React + Vite
+# ChainTask
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack dApp for managing tasks, built with React, Vite, Hardhat, and Solidity. Supports deployment to both a local Hardhat network and the Polygon Amoy Testnet.
 
-Currently, two official plugins are available:
+## Prerequisites
+- Node.js & npm
+- MetaMask extension
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 1. Local Hardhat Deployment
 
-## Expanding the ESLint configuration
+### Backend (Smart Contracts)
+1. Install dependencies:
+   ```bash
+   cd blockchain
+   npm install
+   ```
+2. Start a local Hardhat node:
+   ```bash
+   npx hardhat node
+   ```
+3. Deploy contracts to the local network:
+   ```bash
+   npx hardhat run scripts/deploy.js --network localhost
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Frontend
+1. In a new terminal, install frontend dependencies:
+   ```bash
+   cd ../
+   npm install
+   ```
+2. Start the frontend:
+   ```bash
+   npm run dev
+   ```
+3. Connect MetaMask to `http://localhost:8545` (Hardhat local network).
+
+## 2. Polygon Amoy Testnet Deployment
+
+### Backend (Smart Contracts)
+1. Get test POL from a faucet (see `.env` for faucet URL if running locally).
+2. Configure your wallet and Hardhat for Amoy:
+   - Update `hardhat.config.cjs` with your Amoy RPC and private key.
+3. Deploy contracts:
+   ```bash
+   npx hardhat run scripts/deploy.js --network amoy
+   ```
+
+### Frontend
+1. Start the frontend:
+   ```bash
+   npm run dev
+   ```
+2. Connect MetaMask to Polygon Amoy (Chain ID: 80002, Symbol: POL, RPC: https://rpc-amoy.polygon.technology/).
+
+## Environment Variables
+- `.env` contains configuration such as the faucet URL for local testing.
+
+## Useful Links
+- [Polygon Amoy Faucet](https://faucet.polygon.technology/)
+- [Polygon Amoy Explorer](https://amoy.polygonscan.com/)
+
+---
+For more details, see the contract and frontend source code.
