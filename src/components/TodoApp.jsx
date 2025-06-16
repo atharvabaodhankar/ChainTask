@@ -37,7 +37,7 @@ export default function TodoApp() {
   }, []);
   const requestFaucet = async (address) => {
     try {
-      const res = await fetch("http://localhost:3001/faucet", {
+      const res = await fetch(import.meta.env.VITE_FAUCET_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
