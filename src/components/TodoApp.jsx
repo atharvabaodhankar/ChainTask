@@ -5,15 +5,36 @@ import { CONTRACT_ADDRESS, CONTRACT_ABI } from "../contract/abi";
 export default function TodoApp({ signer }) {
   const [todoContract, setTodoContract] = useState(null);
   const [tasks, setTasks] = useState([]);
-  const [input, setInput] = useState("");
+    const [input, setInput] = useState("");
+    const [account, setAccount] = useState("");
+    const [contract, setContract] = useState(null);
+
 
   useEffect(() => {
-    if (signer) {
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-      setTodoContract(contract);
-      fetchTasks(contract);
-    }
-  }, [signer]);
+    const init = async () => {
+      try {
+        if (!window.ethereum) {
+          alert("Please install MetaMask!");
+          return;
+        }
+
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+
+        const accounts = await provider.send("eth_requestAccounts", []);
+        setAccount(accounts[0]);
+
+        const todoContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+        setContract(todoContract);
+
+        console.log("Connected to local Hardhat contract");
+      } catch (err) {
+        console.error("Error connecting to local blockchain", err);
+      }
+    };
+
+    init();
+  }, []);
 
   const fetchTasks = async (contractInstance) => {
     try {
@@ -25,19 +46,20 @@ export default function TodoApp({ signer }) {
   };
 
   const handleAddTask = async () => {
+    if (!contract) {
+      console.error("Smart contract not initialized yet.");
+      return;
+    }
+  
     try {
-      const tx = await todoContract.addTask(input, {
-        gasLimit: 300000,
-      });
+      const tx = await contract.addTask("Test task");
       await tx.wait();
       console.log("Task added!");
-    } catch (error) {
-      console.error("Add task failed:", error);
-      if (error?.data?.message) {
-        console.error("Reason:", error.data.message);
-      }
+    } catch (err) {
+      console.error("Add task failed:", err);
     }
   };
+  
   
 
   const handleToggle = async (id) => {
