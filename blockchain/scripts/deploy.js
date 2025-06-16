@@ -1,12 +1,10 @@
 const hre = require("hardhat");
 
 async function main() {
-  const ToDoList = await hre.ethers.getContractFactory("ToDoList");
-  const todo = await ToDoList.deploy();
+  const Todo = await hre.ethers.deployContract("ToDoList"); // returns deployed contract already
+  await Todo.waitForDeployment(); // ✅ correct way in ethers v6
 
-  await todo.deployed();
-
-  console.log(`✅ ToDoList deployed at: ${todo.address}`);
+  console.log("Todo deployed to:", await Todo.getAddress());
 }
 
 main().catch((error) => {
