@@ -23,8 +23,7 @@ export default function TodoApp() {
 
         const todoContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
         setContract(todoContract);
-
-        console.log("Connected to contract:", todoContract.address);
+        console.log("Connected to contract:", todoContract.target);
 
         // Now that the contract is initialized, fetch tasks
         fetchTasks(todoContract);
