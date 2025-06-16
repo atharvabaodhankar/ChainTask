@@ -2,13 +2,11 @@ import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from "../contract/abi";
 
-export default function TodoApp({ signer }) {
-  const [todoContract, setTodoContract] = useState(null);
+export default function TodoApp() {
   const [tasks, setTasks] = useState([]);
-    const [input, setInput] = useState("");
-    const [account, setAccount] = useState("");
-    const [contract, setContract] = useState(null);
-
+  const [input, setInput] = useState("");
+  const [account, setAccount] = useState("");
+  const [contract, setContract] = useState(null);
 
   useEffect(() => {
     const init = async () => {
@@ -20,14 +18,16 @@ export default function TodoApp({ signer }) {
 
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
-
         const accounts = await provider.send("eth_requestAccounts", []);
         setAccount(accounts[0]);
 
         const todoContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
         setContract(todoContract);
 
-        console.log("Connected to local Hardhat contract");
+        console.log("Connected to contract:", todoContract.address);
+
+        // Now that the contract is initialized, fetch tasks
+        fetchTasks(todoContract);
       } catch (err) {
         console.error("Error connecting to local blockchain", err);
       }
@@ -46,37 +46,36 @@ export default function TodoApp({ signer }) {
   };
 
   const handleAddTask = async () => {
-    if (!contract) {
-      console.error("Smart contract not initialized yet.");
-      return;
-    }
-  
+    if (!contract || !input.trim()) return;
+
     try {
-      const tx = await contract.addTask("Test task");
+      const tx = await contract.addTask(input);
       await tx.wait();
+      setInput("");
+      fetchTasks(contract);
       console.log("Task added!");
     } catch (err) {
       console.error("Add task failed:", err);
     }
   };
-  
-  
 
   const handleToggle = async (id) => {
+    if (!contract) return;
     try {
-      const tx = await todoContract.toggleTask(id);
+      const tx = await contract.toggleTask(id);
       await tx.wait();
-      fetchTasks(todoContract);
+      fetchTasks(contract);
     } catch (err) {
       console.error("Toggle failed:", err);
     }
   };
 
   const handleDelete = async (id) => {
+    if (!contract) return;
     try {
-      const tx = await todoContract.deleteTask(id);
+      const tx = await contract.deleteTask(id);
       await tx.wait();
-      fetchTasks(todoContract);
+      fetchTasks(contract);
     } catch (err) {
       console.error("Delete failed:", err);
     }
@@ -102,16 +101,16 @@ export default function TodoApp({ signer }) {
       <ul>
         {tasks.map((task) => (
           <li
-            key={task.id}
+            key={Number(task.id)}
             className={`flex justify-between items-center py-2 border-b ${
               task.completed ? "text-green-600 line-through" : ""
             }`}
           >
-            <span onClick={() => handleToggle(task.id)} className="cursor-pointer">
+            <span onClick={() => handleToggle(Number(task.id))} className="cursor-pointer">
               {task.content}
             </span>
             <button
-              onClick={() => handleDelete(task.id)}
+              onClick={() => handleDelete(Number(task.id))}
               className="text-red-500 hover:text-red-700"
             >
               ❌
