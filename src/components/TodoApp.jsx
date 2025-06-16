@@ -35,6 +35,29 @@ export default function TodoApp() {
 
     init();
   }, []);
+  const requestFaucet = async (address) => {
+    try {
+      const res = await fetch("http://localhost:3001/faucet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ address }),
+      });
+  
+      const data = await res.json();
+      if (data.success) {
+        console.log("💸 Faucet tx hash:", data.hash);
+        alert("You received 2 MATIC!");
+      } else {
+        alert(data.error);
+      }
+    } catch (err) {
+      console.error("Faucet error:", err);
+      alert("Faucet failed.");
+    }
+  };
+  
 
   const fetchTasks = async (contractInstance) => {
     try {
@@ -123,7 +146,15 @@ export default function TodoApp() {
             </button>
           </li>
         ))}
-      </ul>
+          </ul>
+          <div>
+            <button
+              onClick={() => requestFaucet(account)}
+              className="bg-blue-600 text-white px-4 py-2 rounded mt-4"
+            >
+              Request MATIC
+            </button>
+          </div>
     </div>
   );
 }
